@@ -4,11 +4,16 @@ p = 1/rps;
 half_p = p/2;
 dt = .000001; % time increment in seconds
 head_m = 1.0; % mass of piston head in kg
-rod_l = .155575; % length of connecting rod in meters
-crank_l = .099060; % length of crank throw in meters
+rod_m = 5.44311; %mass of piston rod in kg (12 lbs)
+rod_l = 0.1525; % length of connecting rod in meters (6' rod)
+rod_w = 0.0251; % width of connecting rod in meters
+rod_com = [rod_l/2; rod_w/2]; % [x; y] of center of mass of connecting rod
+crank_l = 0.099060; % length of crank throw in meters (3.9' stroke)
+% assume crankshaft is balanced
 tdc_l = rod_l + crank_l;
 bdc_l = rod_l - crank_l;
 
+%% Function Handles
 crank_angle = @(t) 2*pi*rps.*mod(t,p);
 rod_angle = @(t) asin((crank_l/rod_l) * sin(crank_angle(t))); % calculate the angle between the crank arm and piston rod
 crank_rod_angle = @(t) pi - rod_angle(t) - crank_angle(t); % calculate the angle between the piston stroke and piston rod
