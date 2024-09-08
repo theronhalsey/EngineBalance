@@ -20,20 +20,42 @@ crank_rod_angle = @(t) pi - rod_angle(t) - crank_angle(t); % calculate the angle
 crank_x = @(t) crank_l .* cos(crank_angle(t)); % calculate the x position of the crank arm end at time t
 
 t = 0:dt:2*p;
-y = arrayfun(@(t) head_y(t,crank_rod_angle,crank_angle,p,half_p,tdc_l,bdc_l,rod_l), t);
-a = diff(y)/dt;
-f = head_m*a;
+head_y = arrayfun(@(t) calc_head_y(t,crank_rod_angle,crank_angle,p,half_p,tdc_l,bdc_l,rod_l), t);
+head_v = diff(head_y)/dt;
+head_a = diff(head_v)/dt;
+f = head_m*head_a;
 
+%% Plotting
+tiledlayout(1,2);
+
+nexttile
 hold on
-yyaxis left
+title("Piston Head Location")
 yline(rod_l+crank_l)
 yline(rod_l-crank_l)
-plot(t,y)
+plot(t,head_y)
 
+nexttile
+hold on
+title("Piston Head Velocity and Acceleration")
+yyaxis left
+plot(t(2:end),head_v,Color='b')
+yliml = get(gca,"Ylim");
+ratio = yliml(1)/yliml(2);
 yyaxis right
-plot(t(2:end),f)
+plot(t(3:end),head_a,Color='r')
+ylimr = get(gca,'Ylim');
+yline(0,Color='k')
+if ylimr(2)*ratio<ylimr(1)
+    set(gca,'Ylim',[ylimr(2)*ratio ylimr(2)])
+else
+    set(gca,'Ylim',[ylimr(1) ylimr(1)/ratio])
+end
+legend("Velocity", "Acceleration",'',Location='southoutside')
+legend('boxoff')
 
-function y = head_y(t,crank_rod_angle,crank_angle,p,half_p,tdc_l,bdc_l,rod_l) % calculate the y position of the piston head
+%% Functions
+function y = calc_head_y(t,crank_rod_angle,crank_angle,p,half_p,tdc_l,bdc_l,rod_l) % calculate the y position of the piston head
 switch mod(t,p)
     case 0
         y = tdc_l;
