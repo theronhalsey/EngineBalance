@@ -1,3 +1,4 @@
+tic
 % engine parameters
 rpm = 4000;
 rps = rpm/60;
@@ -6,7 +7,7 @@ half_p = p/2;
 
 % time parameters
 dt = .000001; % time increment in seconds
-t = 0:dt:2*p;
+t = 0:dt:p;
 
 % piston head
 head_m = 1.0; % mass of piston head in kg
@@ -24,29 +25,29 @@ crank_l = 0.099060; % length of crank throw in meters (3.9' stroke)
 tdc_l = rod_l + crank_l;
 bdc_l = rod_l - crank_l;
 
-%% Function Handles
+%% Calculate Angles
 f_crank_angle = @(t) 2*pi*rps.*mod(t,p);
-f_rod_angle = @(t) asin((crank_l/rod_l) * sin(f_crank_angle(t))); % calculate the angle between the crank arm and piston rod
-f_crank_rod_angle = @(t) pi - f_rod_angle(t) - f_crank_angle(t); % calculate the angle between the piston stroke and piston rod
-f_head_y = @(t) sqrt(crank_l^2 + rod_l^2 - 2*crank_l*rod_l * cos(f_crank_rod_angle(t)));
-f_crank_xy = @(t) crank_l .* [cos(f_crank_angle(t)); sin(f_crank_angle(t))]; % calculate the [x;y] positions of the crank arm end at time t
-f_rod_com_xy = @(t) crank_l .* [0.5 * sin(f_crank_angle(t)); 0.5 * rod_l + cos(f_crank_angle(t))]; % calculate the [x;y] positions of com of connecting rod at time t
+crank_angles = f_crank_angle(t);
+rod_angles = asin((crank_l/rod_l) * sin(crank_angles)); % calculate the angle between the crank arm and piston rod
+crank_rod_angles = pi - rod_angles - crank_angles; % calculate the angle between the piston stroke and piston rod
 
-%% Calculation
+%f_crank_xy = @(t) crank_l .* [cos(f_crank_angle(t)); sin(f_crank_angle(t))]; % calculate the [x;y] positions of the crank arm end at time t
+
+%% Calculate Forces
 % piston head
-head_y = f_head_y(t); % piston head location
+head_y = sqrt(crank_l^2 + rod_l^2 - 2*crank_l*rod_l * cos(crank_rod_angles)); % piston head location
 head_v = diff(head_y)/dt; % piston head velocity
 head_a = diff(head_v)/dt; % piston head acceleration
 head_f = head_m*head_a; % piston head force
 
 % piston rod
-rod_xy = f_rod_com_xy(t);
+rod_xy = crank_l .* [0.5 * sin(crank_angles); 0.5 * rod_l + cos(crank_angles)];
 rod_v = [diff(rod_xy(1,:)); diff(rod_xy(2,:))]/dt;
 rod_a = [diff(rod_v(1,:)); diff(rod_v(2,:))]/dt;
 rod_f = rod_m*rod_a;
 
 %% Plotting
-tiledlayout(1,3);
+tiledlayout(2,2);
 
 % piston head location
 nexttile
@@ -84,3 +85,5 @@ legend('boxoff')
 
 nexttile
 plot(rod_xy(1,1:(end-1)), rod_xy(2,1:(end-1)))
+
+toc
