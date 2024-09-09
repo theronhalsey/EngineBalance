@@ -1,4 +1,3 @@
-tic
 % engine parameters
 rpm = 4000;
 rps = rpm/60;
@@ -10,7 +9,7 @@ dt = .000001; % time increment in seconds
 t = 0:dt:2*p;
 
 % piston angle parameters
-piston_angle = pi/6;
+piston_angle = 0;
 crank_offset = 0;
 
 % piston head
@@ -91,5 +90,3 @@ legend("Velocity x","Velocity y","Acceleration x","Acceleration y",'',Location='
 
 nexttile
 plot(rod_xy(1,1:(end-1)), rod_xy(2,1:(end-1)))
-
-toc
