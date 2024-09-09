@@ -8,12 +8,15 @@ half_p = p/2;
 dt = .000001; % time increment in seconds
 t = 0:dt:2*p;
 
-% piston angle parameters
+% piston parameters
+head_m = 1.0; % mass of piston head in kg
 piston_angle = 0;
 crank_offset = 0;
 
-% piston head
-head_m = 1.0; % mass of piston head in kg
+% counterweight
+counterweight_m = 0.5; % mass of counterweight
+counterweight_l = 0.099060; % distance to center of mass of counterweight from center of crankshaft
+counterweight_offset = 0;
 
 % piston rod
 rod_m = 5.44311; %mass of piston rod in kg (12 lbs)
@@ -24,34 +27,38 @@ rod_com = [rod_l/2; rod_w/2]; % [x; y] of center of mass of connecting rod
 % crankshaft (assume crankshaft is balanced)
 crank_l = 0.099060; % length of crank throw in meters (3.9' stroke)
 
-% top and bottom dead center
-tdc_l = rod_l + crank_l;
-bdc_l = rod_l - crank_l;
 
 %% Calculate Angles and Displacement
 f_crank_angle = @(t) 2*pi*rps.*mod(t,p) + crank_offset;
 crank_angles = f_crank_angle(t);
+crank_xy = crank_l .* [sin(crank_angles); cos(crank_angles)]; % calculate the [x;y] positions of the crank arm end at time t
 rod_angles = asin((crank_l/rod_l) * sin(crank_angles)); % calculate the angle between the crank arm and piston rod
 crank_rod_angles = pi - rod_angles - crank_angles; % calculate the angle between the piston stroke and piston rod
 head_displacement = sqrt(crank_l^2 + rod_l^2 - 2*crank_l*rod_l * cos(crank_rod_angles)); % piston head displacement along stroke
 
-%f_crank_xy = @(t) crank_l .* [cos(f_crank_angle(t)); sin(f_crank_angle(t))]; % calculate the [x;y] positions of the crank arm end at time t
 
 %% Calculate Forces
 % piston head
-head_xy = head_displacement .* [sin(piston_angle); cos(piston_angle)]; % piston head location
+head_xy = head_displacement .* [sin(piston_angle); cos(piston_angle)]; % piston head displacement along stroke
 head_v = [diff(head_xy(1,:)); diff(head_xy(2,:))]/dt; % piston head velocity
 head_a = [diff(head_v(1,:)); diff(head_v(2,:))]/dt; % piston head acceleration
 head_f = head_m*head_a; % piston head force
 
 % piston rod
-rod_xy = crank_l .* [0.5 * sin(crank_angles); 0.5 * rod_l + cos(crank_angles)];
+rod_xy = crank_xy/2;
 rod_v = [diff(rod_xy(1,:)); diff(rod_xy(2,:))]/dt;
 rod_a = [diff(rod_v(1,:)); diff(rod_v(2,:))]/dt;
 rod_f = rod_m*rod_a;
 
+% counterweight
+counterweight_xy = counterweight_offset * [sin(crank_angles + counterweight_offset); cos(crank_angles + counterweight_offset)];
+counterweight_v = [diff(counterweight_xy(1,:)); diff(counterweight_xy(2,:))]/dt;
+counterweight_a = [diff(counterweight_v(1,:)); diff(counterweight_v(2,:))]/dt;
+counterweight_f = counterweight_m*counterweight_a;
+
+
 %% Plotting
-tiledlayout(2,2);
+tiledlayout(1,2);
 
 % piston head location
 nexttile
@@ -87,6 +94,3 @@ else
     set(gca,'Ylim',[ylimr(1) ylimr(1)/ratio])
 end
 legend("Velocity x","Velocity y","Acceleration x","Acceleration y",'',Location='southoutside')
-
-nexttile
-plot(rod_xy(1,1:(end-1)), rod_xy(2,1:(end-1)))
