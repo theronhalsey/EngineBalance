@@ -9,7 +9,7 @@ t = 0:dt:p-dt;
 
 % crankshaft (assume crankshaft is balanced)
 crank_l = 0.099060; % length of crank throw in meters (3.9' stroke)
-f_crank_angle = @(t) 2*pi*rps.*mod(t,p) + crank_offset;
+f_crank_angle = @(t) 2*pi*rps.*mod(t,p);
 crank_angles = f_crank_angle(t);
 
 % piston parameters
