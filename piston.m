@@ -1,9 +1,9 @@
-function pistonForces = piston(p,rps,t,dt,crank_l,head_m,piston_angle,crank_offset,rod_m,rod_l,counterweight_m,counterweight_l,counterweight_offset)
+function pistonForces = piston(p,rps,t,dt,crank_l,head_m,piston_angle,rod_m,rod_l,counterweight_m,counterweight_l,counterweight_offset)
 % time parameters
 t = [t p p+dt];
 
 %% Calculate Angles and Displacement
-f_crank_angle = @(t) 2*pi*rps.*mod(t,p) + crank_offset;
+f_crank_angle = @(t) 2*pi*rps.*t + piston_angle;
 crank_angles = f_crank_angle(t);
 rod_angles = asin((crank_l/rod_l) * sin(crank_angles)); % calculate the angle between the crank arm and piston rod
 crank_rod_angles = pi - rod_angles - crank_angles; % calculate the angle between the piston stroke and piston rod
@@ -18,7 +18,7 @@ head_a = [diff(head_v(1,:)); diff(head_v(2,:))]/dt; % piston head acceleration
 head_f = head_m*head_a; % piston head force
 
 % piston rod
-rod_xy = crank_xy/2;
+rod_xy = (head_xy+crank_xy)/2;
 rod_v = [diff(rod_xy(1,:)); diff(rod_xy(2,:))]/dt;
 rod_a = [diff(rod_v(1,:)); diff(rod_v(2,:))]/dt;
 rod_f = rod_m*rod_a;
