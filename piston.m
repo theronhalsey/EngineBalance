@@ -10,7 +10,6 @@ crank_rod_angles = pi - rod_angles - crank_angles; % calculate the angle between
 head_displacement = sqrt(crank_l^2 + rod_l^2 - 2*crank_l*rod_l * cos(crank_rod_angles)); % piston head displacement along stroke
 crank_xy = crank_l .* [sin(crank_angles); cos(crank_angles)]; % calculate the [x;y] positions of the crank arm end at time t
 
-
 %% Calculate Forces
 % piston head
 head_xy = head_displacement .* [sin(piston_angle); cos(piston_angle)]; % piston head displacement along stroke
@@ -30,44 +29,6 @@ counterweight_v = [diff(counterweight_xy(1,:)); diff(counterweight_xy(2,:))]/dt;
 counterweight_a = [diff(counterweight_v(1,:)); diff(counterweight_v(2,:))]/dt;
 counterweight_f = counterweight_m*counterweight_a;
 
+%% Generate Output Matrix
 pistonForces = [crank_xy(:,1:end-2); head_xy(:,1:end-2); [head_f(:,end-1:end) head_f(:,1:end-2)]; rod_xy(:,1:end-2); [rod_f(:,end-1:end) rod_f(:,1:end-2)]; counterweight_xy(:,1:end-2); [counterweight_f(:,end-1:end) counterweight_f(:,1:end-2)]];
-
-% %% Plotting
-% tiledlayout(1,2);
-% 
-% % piston head location
-% nexttile
-% hold on
-% title("Piston Head Displacement")
-% plot(t(3:end),head_xy(1,3:end),Color='r',LineStyle='-')
-% plot(t(3:end),head_xy(2,3:end),Color='b',LineStyle='-')
-% legend("x", "y",Location='southoutside')
-% 
-% % piston head velocity and acceleration
-% nexttile
-% hold on
-% title("Piston Head Velocity and Acceleration")
-% 
-% % plot velocity
-% yyaxis left
-% plot(t(3:end),head_v(1,2:end),Color='r',LineStyle='-')
-% plot(t(3:end),head_v(2,2:end),Color='b',LineStyle='-')
-% yliml = get(gca,"Ylim"); % y limit for aligning 0 on both y-axes
-% ratio = yliml(1)/yliml(2);
-% 
-% % plot acceleration
-% yyaxis right
-% plot(t(3:end),head_a(1,:),Color='g',LineStyle='-')
-% plot(t(3:end),head_a(2,:),Color='m',LineStyle='-')
-% ylimr = get(gca,'Ylim');
-% 
-% % format combined plot
-% yline(0,Color='k') % draw a line at 0
-% if ylimr(2)*ratio<ylimr(1) % align 0 on left and right axes
-%     set(gca,'Ylim',[ylimr(2)*ratio ylimr(2)])
-% else
-%     set(gca,'Ylim',[ylimr(1) ylimr(1)/ratio])
-% end
-% legend("Velocity x","Velocity y","Acceleration x","Acceleration y",'',Location='southoutside')
-
 end

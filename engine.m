@@ -36,19 +36,20 @@ rod_xy = Forces(7:8,:);
 rod_f = Forces(9:10,:);
 counterweight_xy = Forces(11:12,:);
 counterweight_f = Forces(13:14,:);
+total_f = head_f + rod_f + counterweight_f;
 
 %% Plotting
-tiledlayout(1,3);
+tiledlayout(2,2);
 
 % piston head
 nexttile
 hold on
 title("Piston Head")
 yyaxis left
-plot(t,head_xy(1,:),Color='r',LineStyle='-')
+plot(t,head_xy(1,:),Color='b',LineStyle='-')
 plot(t,head_xy(2,:),Color='g',LineStyle='-')
 yyaxis right
-plot(t,head_f(1,:),Color='b',LineStyle='-')
+plot(t,head_f(1,:),Color='r',LineStyle='-')
 plot(t,head_f(2,:),Color='m',LineStyle='-')
 legend("x-displacement","y-displacement","x-force","y-force",Location='southoutside')
 
@@ -57,23 +58,32 @@ nexttile
 hold on
 title("Piston Rod")
 yyaxis left
-plot(t,rod_xy(1,:),Color='r',LineStyle='-')
+plot(t,rod_xy(1,:),Color='b',LineStyle='-')
 plot(t,rod_xy(2,:),Color='g',LineStyle='-')
 yyaxis right
-plot(t,rod_f(1,:),Color='b',LineStyle='-')
+plot(t,rod_f(1,:),Color='r',LineStyle='-')
 plot(t,rod_f(2,:),Color='m',LineStyle='-')
-legend("x-displacement", "x-force","y-displacement", "y-force",Location='southoutside')
+legend("x-displacement","y-displacement","x-force","y-force",Location='southoutside')
 
 % plot counterweight
 nexttile
 hold on
 title("Counterweight")
 yyaxis left
-plot(t,counterweight_xy(1,:),Color='r',LineStyle='-')
+plot(t,counterweight_xy(1,:),Color='b',LineStyle='-')
 plot(t,counterweight_xy(2,:),Color='g',LineStyle='-')
 yyaxis right
-plot(t,counterweight_f(1,:),Color='b',LineStyle='-')
+plot(t,counterweight_f(1,:),Color='r',LineStyle='-')
 plot(t,counterweight_f(2,:),Color='m',LineStyle='-')
-legend("x-displacement", "x-force","y-displacement", "y-force",Location='southoutside')
+legend("x-displacement","y-displacement","x-force","y-force",Location='southoutside')
 
 % plot total force on crankshaft
+nexttile
+hold on
+title("Total Force")
+yyaxis left
+plot(t,crank_angles,Color='b',LineStyle='-')
+yyaxis right
+plot(t,total_f(1,:),Color='r',LineStyle='-')
+plot(t,total_f(2,:),Color='m',LineStyle='-')
+legend("crank angle","x-force","y-force",Location='southoutside')
