@@ -9,6 +9,8 @@ t = 0:dt:p-dt;
 
 % crankshaft (assume crankshaft is balanced)
 crank_l = 0.099060; % length of crank throw in meters (3.9' stroke)
+f_crank_angle = @(t) 2*pi*rps.*mod(t,p) + crank_offset;
+crank_angles = f_crank_angle(t);
 
 % piston parameters
 head_m = 1.0; % mass of piston head in kg
@@ -36,39 +38,42 @@ counterweight_xy = Forces(11:12,:);
 counterweight_f = Forces(13:14,:);
 
 %% Plotting
-tiledlayout(1,2);
+tiledlayout(1,3);
 
-% piston head location
+% piston head
 nexttile
 hold on
-title("Piston Head Displacement")
-plot(t,head_xy(1,:),Color='r',LineStyle='-')
-plot(t,head_xy(2,:),Color='b',LineStyle='-')
-legend("x", "y",Location='southoutside')
-
-% piston head velocity and acceleration
-nexttile
-hold on
-title("Piston Head Velocity and Acceleration")
-
-% plot velocity
+title("Piston Head")
 yyaxis left
-plot(t,head_v(1,:),Color='r',LineStyle='-')
-plot(t,head_v(2,:),Color='b',LineStyle='-')
-yliml = get(gca,"Ylim"); % y limit for aligning 0 on both y-axes
-ratio = yliml(1)/yliml(2);
-
-% plot acceleration
+plot(t,head_xy(1,:),Color='r',LineStyle='-')
+plot(t,head_xy(2,:),Color='g',LineStyle='-')
 yyaxis right
-plot(t,head_a(1,:),Color='g',LineStyle='-')
-plot(t,head_a(2,:),Color='m',LineStyle='-')
-ylimr = get(gca,'Ylim');
+plot(t,head_f(1,:),Color='b',LineStyle='-')
+plot(t,head_f(2,:),Color='m',LineStyle='-')
+legend("x-displacement","y-displacement","x-force","y-force",Location='southoutside')
 
-% format combined plot
-yline(0,Color='k') % draw a line at 0
-if ylimr(2)*ratio<ylimr(1) % align 0 on left and right axes
-    set(gca,'Ylim',[ylimr(2)*ratio ylimr(2)])
-else
-    set(gca,'Ylim',[ylimr(1) ylimr(1)/ratio])
-end
-legend("Velocity x","Velocity y","Acceleration x","Acceleration y",'',Location='southoutside')
+% piston rod
+nexttile
+hold on
+title("Piston Rod")
+yyaxis left
+plot(t,rod_xy(1,:),Color='r',LineStyle='-')
+plot(t,rod_xy(2,:),Color='g',LineStyle='-')
+yyaxis right
+plot(t,rod_f(1,:),Color='b',LineStyle='-')
+plot(t,rod_f(2,:),Color='m',LineStyle='-')
+legend("x-displacement", "x-force","y-displacement", "y-force",Location='southoutside')
+
+% plot counterweight
+nexttile
+hold on
+title("Counterweight")
+yyaxis left
+plot(t,counterweight_xy(1,:),Color='r',LineStyle='-')
+plot(t,counterweight_xy(2,:),Color='g',LineStyle='-')
+yyaxis right
+plot(t,counterweight_f(1,:),Color='b',LineStyle='-')
+plot(t,counterweight_f(2,:),Color='m',LineStyle='-')
+legend("x-displacement", "x-force","y-displacement", "y-force",Location='southoutside')
+
+% plot total force on crankshaft
