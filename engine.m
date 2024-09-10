@@ -5,20 +5,21 @@ p = 1/rps;
 
 % time parameters
 dt = .00001; % time increment in seconds
-t = 0:dt:p-dt;
+t = 0:dt:p+dt;
 
 % crankshaft (assume crankshaft is balanced)
-crank_l = 0.099060; % length of crank throw in meters (3.9' stroke)
+crank_l = 0.099060/2; % length of crank throw in meters (3.9' stroke)
 f_crank_angle = @(t) 2*pi*rps.*mod(t,p);
-%crank_angles = f_crank_angle(t);
+crank_angles = f_crank_angle(t);
 
 % piston parameters
 head_m = 1.0; % mass of piston head in kg
 piston_angle = 0;
+crank_offset = pi/2;
 
 % counterweight
 counterweight_m = 0.5; % mass of counterweight
-counterweight_l = crank_l * 1.25; % distance to center of mass of counterweight from center of crankshaft
+counterweight_l = crank_l * 0.75; % distance to center of mass of counterweight from center of crankshaft
 counterweight_offset = piston_angle + pi;
 
 % piston rod
@@ -26,7 +27,7 @@ rod_m = 5.44311; %mass of piston rod in kg (12 lbs)
 rod_l = 0.1525; % length of connecting rod in meters (6' rod)
 rod_w = 0.0251; % width of connecting rod in meters
 
-Forces = piston(p,rps,t,dt,crank_l,head_m,piston_angle,rod_m,rod_l,counterweight_m,counterweight_l,counterweight_offset);
+Forces = piston(dt,crank_angles,crank_offset,crank_l,head_m,piston_angle,rod_m,rod_l,counterweight_m,counterweight_l,counterweight_offset);
 
 crank_xy = Forces(1:2,:);
 head_xy = Forces(3:4,:);
@@ -113,7 +114,7 @@ crank_arm_body = animatedline('color',crank_arm_color,'LineStyle','-');
 crank_shaft_location = animatedline('color',crank_shaft_color,'Marker','.','markersize',20);
 addpoints(crank_shaft_location,0,0)
 
-for i=1:length(t)
+for i=1:length(Forces)
     clearpoints(piston_head_location)
     clearpoints(rod_com_location)
     clearpoints(counterweight_location)
