@@ -37,7 +37,7 @@ counterweight_offset = crank_offset + pi;
 
 %% Calculate Piston Forces
 Forces = zeros(14,n_points,n_pistons);
-parfor i=1:n_pistons
+for i=1:n_pistons
     Forces(:,:,i) = piston(dt,crank_angles,crank_offset(i),crank_l,head_m,piston_angle(i),rod_m,rod_l,counterweight_m(i),counterweight_l(i),counterweight_offset(i));
 end
 
@@ -61,7 +61,6 @@ counterweight_body = animatedline().empty(0,n_pistons);
 crank_arm_location = animatedline().empty(0,n_pistons);
 crank_arm_path = animatedline().empty(0,n_pistons);
 crank_rod_connection = animatedline().empty(0,n_pistons);
-
 
 for i=1:n_pistons
     piston_head_location(i) = animatedline('color',piston_head_color,'Marker','.','markersize',20);
@@ -99,12 +98,10 @@ while 1
         clearpoints(rod_com_location(j))
         clearpoints(counterweight_location(j))
         clearpoints(crank_arm_location(j))
-
         clearpoints(rod_body(j))
         clearpoints(counterweight_body(j))
         clearpoints(crank_rod_connection(j))
         
-
         addpoints(piston_head_location(j),head_xy(1,i),head_xy(2,i))
         addpoints(piston_head_path(j),head_xy(1,i),head_xy(2,i))
         addpoints(rod_body(j),[head_xy(1,i) piston_crank_xy(1,i)],[head_xy(2,i) piston_crank_xy(2,i)])
@@ -116,13 +113,11 @@ while 1
         addpoints(counterweight_location(j),counterweight_xy(1,i),counterweight_xy(2,i))
         addpoints(counterweight_path(j),counterweight_xy(1,i),counterweight_xy(2,i))
         addpoints(counterweight_body(j),[counterweight_xy(1,i) 0],[counterweight_xy(2,i) 0])
-        
     end
-
     addpoints(crank_shaft_rotation,crank_xy(1,i),crank_xy(2,i))
     addpoints(crank_shaft_point,[crank_xy(1,i) 0],[crank_xy(2,i) 0])
-
     drawnow
+    
     i = mod(i,n_points);
     i = i+1;
 end
