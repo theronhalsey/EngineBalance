@@ -15,12 +15,12 @@ crank_angles = f_crank_angle(t);
 % piston parameters
 head_m = 1.0; % mass of piston head in kg
 piston_angle = 0;
-crank_offset = pi/2;
+crank_offset = 0;
 
 % counterweight
 counterweight_m = 0.5; % mass of counterweight
 counterweight_l = crank_l * 0.75; % distance to center of mass of counterweight from center of crankshaft
-counterweight_offset = piston_angle + pi;
+counterweight_offset = crank_offset + pi;
 
 % piston rod
 rod_m = 5.44311; %mass of piston rod in kg (12 lbs)
@@ -114,7 +114,9 @@ crank_arm_body = animatedline('color',crank_arm_color,'LineStyle','-');
 crank_shaft_location = animatedline('color',crank_shaft_color,'Marker','.','markersize',20);
 addpoints(crank_shaft_location,0,0)
 
-for i=1:length(Forces)
+i = 1;
+j = length(Forces);
+while 1
     clearpoints(piston_head_location)
     clearpoints(rod_com_location)
     clearpoints(counterweight_location)
@@ -137,4 +139,6 @@ for i=1:length(Forces)
     addpoints(counterweight_body,[counterweight_xy(1,i) 0],[counterweight_xy(2,i) 0])
     
     drawnow
+    i = mod(i,j);
+    i = i+1;
 end
