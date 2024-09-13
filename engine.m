@@ -40,11 +40,16 @@ for i=1:n_pistons
     Forces(:,:,i) = piston(dt,crank_angles,crank_offset(i),crank_l,head_m,piston_angle(i),rod_m,rod_l,counterweight_m(i),counterweight_l(i),counterweight_offset(i));
 end
 
+% total force on crankshaft at time t
+total_f = Forces(9:10,:,:) + Forces(11:12,:,:) + Forces(13:14,:,:);
+
+% max displacement and force
 max_displacement = max(abs(Forces(3:4,:,:)),[],'all') * 1.1;
-max_force = max(abs(Forces(9:end,:,:)),[],'all');
+max_force = max(abs(total_f),[],'all');
 
 % scale forces to displacement
 Forces(9:end,:,:) = Forces(9:end,:,:) * (max_displacement/max_force);
+
 
 %% Animation
 piston_head_color = 'r';
@@ -82,7 +87,7 @@ for i=1:n_pistons
     piston_head_path(i) = animatedline('color',piston_head_color,'LineStyle','-');
     piston_head_force_x(i) = animatedline('color',piston_head_color,'LineStyle','-');
     piston_head_force_y(i) = animatedline('color',piston_head_color,'LineStyle','-');
-    
+
     rod_com_location(i) = animatedline('color',rod_color,'Marker','.','markersize',20);
     rod_com_path(i) = animatedline('color',rod_color,'LineStyle','-');
     rod_com_force_x(i) = animatedline('color',rod_color,'LineStyle','-');
@@ -101,11 +106,15 @@ end
 crank_shaft_point = animatedline('color',crank_shaft_color,'Marker','.','markersize',20);
 crank_shaft_rotation = animatedline('color',crank_shaft_color,'LineStyle','-');
 crank_shaft_center = animatedline('color',crank_shaft_color,'Marker','.','markersize',20);
+crank_shaft_force_x = animatedline('color',crank_shaft_color,'LineStyle','-');
+crank_shaft_force_y = animatedline('color',crank_shaft_color,'LineStyle','-');
 addpoints(crank_shaft_center,0,0)
 
 i = 1;
 while 1
     clearpoints(crank_shaft_point)
+    clearpoints(crank_shaft_force_x)
+    clearpoints(crank_shaft_force_y)
     for j=1:n_pistons
         piston_crank_xy = Forces(1:2,:,j);
         head_xy = Forces(3:4,:,j);
@@ -114,7 +123,6 @@ while 1
         head_f = Forces(9:10,:,j);
         rod_f = Forces(11:12,:,j);
         counterweight_f = Forces(13:14,:,j);
-        total_f = head_f + rod_f + counterweight_f;
 
         clearpoints(piston_head_location(j))
         clearpoints(piston_head_force_x(j))
@@ -130,7 +138,7 @@ while 1
         clearpoints(counterweight_force_y(j))
 
         clearpoints(crank_arm_location(j))
-        
+
         addpoints(piston_head_location(j),head_xy(1,i),head_xy(2,i))
         addpoints(piston_head_path(j),head_xy(1,i),head_xy(2,i))
         addpoints(piston_head_force_x(j),[head_xy(1,i) head_xy(1,i)+head_f(1,i)], [head_xy(2,i) head_xy(2,i)])
@@ -146,11 +154,13 @@ while 1
         addpoints(counterweight_path(j),counterweight_xy(1,i),counterweight_xy(2,i))
         addpoints(counterweight_force_x(j),[counterweight_xy(1,i) counterweight_xy(1,i)+counterweight_f(1,i)],[counterweight_xy(2,i) counterweight_xy(2,i)])
         addpoints(counterweight_force_y(j),[counterweight_xy(1,i) counterweight_xy(1,i)],[counterweight_xy(2,i) counterweight_xy(2,i)+counterweight_f(2,i)])
+        addpoints(crank_shaft_force_x,[0 total_f(1,i)],[0 0])
+        addpoints(crank_shaft_force_y,[0 0],[0 total_f(2,i)])
     end
     addpoints(crank_shaft_rotation,crank_xy(1,i),crank_xy(2,i))
     addpoints(crank_shaft_point,[crank_xy(1,i) 0],[crank_xy(2,i) 0])
     drawnow
-    
+
     i = mod(i,n_points);
     i = i+1;
 end
