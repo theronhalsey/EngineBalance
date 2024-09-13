@@ -35,7 +35,7 @@ crank_offset = piston_angle + [0 pi];
 
 % counterweight
 counterweight_m = (head_m + rod_m) * ones(1,n_pistons); % mass of counterweight
-counterweight_l = crank_l * 0.75 * ones(1,n_pistons); % distance to center of mass of counterweight from center of crankshaft
+counterweight_l = crank_l * 1.1 * ones(1,n_pistons); % distance to center of mass of counterweight from center of crankshaft
 counterweight_offset = crank_offset + pi;
 
 %% Calculate Piston Forces
@@ -134,9 +134,6 @@ addpoints(crank_shaft_center,0,0)
 
 i = 1; % increment for animation
 while 1
-    clearpoints(crank_shaft_point)
-    clearpoints(crank_shaft_force_x)
-    clearpoints(crank_shaft_force_y)
     for j=1:n_pistons
         piston_crank_xy = Forces(1:2,i,j);
         head_xy = Forces(3:4,i,j);
@@ -188,11 +185,15 @@ while 1
             addpoints(counterweight_force_x(j),[counterweight_xy(1) counterweight_xy(1)+counterweight_f(1)],[counterweight_xy(2) counterweight_xy(2)])
             addpoints(counterweight_force_y(j),[counterweight_xy(1) counterweight_xy(1)],[counterweight_xy(2) counterweight_xy(2)+counterweight_f(2)])
         end
-        addpoints(crank_shaft_force_x,[0 crankshaft_force(1)],[0 0])
-        addpoints(crank_shaft_force_y,[0 0],[0 crankshaft_force(2)])
     end
-    addpoints(crank_shaft_rotation,crank_xy(1),crank_xy(2))
-    addpoints(crank_shaft_point,[0 crank_xy(1)],[0 crank_xy(2)])
+    clearpoints(crank_shaft_point)
+    clearpoints(crank_shaft_force_x)
+    clearpoints(crank_shaft_force_y)
+
+    addpoints(crank_shaft_force_x,[0 crankshaft_force(1,i)],[0 0])
+    addpoints(crank_shaft_force_y,[0 0],[0 crankshaft_force(2,i)])
+    addpoints(crank_shaft_rotation,crank_xy(1,i),crank_xy(2,i))
+    addpoints(crank_shaft_point,[0 crank_xy(1,i)],[0 crank_xy(2,i)])
     drawnow
 
     i = mod(i,n_points);
