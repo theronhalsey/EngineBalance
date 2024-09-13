@@ -30,7 +30,7 @@ piston_angle = [pi/4 3*pi/4];
 crank_offset = piston_angle + [0 pi];
 
 % counterweight
-counterweight_m = 0.5 * ones(1,n_pistons); % mass of counterweight
+counterweight_m = (head_m + rod_m) * ones(1,n_pistons); % mass of counterweight
 counterweight_l = crank_l * 0.75 * ones(1,n_pistons); % distance to center of mass of counterweight from center of crankshaft
 counterweight_offset = crank_offset + pi;
 
@@ -41,15 +41,14 @@ for i=1:n_pistons
 end
 
 % total force on crankshaft at time t
-total_f = Forces(9:10,:,:) + Forces(11:12,:,:) + Forces(13:14,:,:);
+crankshaft_force = -Forces(9:10,:,:) - Forces(11:12,:,:) - Forces(13:14,:,:);
 
 % max displacement and force
-max_displacement = max(abs(Forces(3:4,:,:)),[],'all') * 1.1;
-max_force = max(abs(total_f),[],'all');
+max_displacement = max(abs(Forces(3:4,:,:)),[],'all');
+max_force = max(abs(crankshaft_force),[],'all');
 
-% scale forces to displacement
-Forces(9:end,:,:) = Forces(9:end,:,:) * (max_displacement/max_force);
-
+% scale displacement to force
+Forces(1:8,:,:) = Forces(1:8,:,:) * (max_force/max_displacement);
 
 %% Animation
 piston_head_color = 'r';
@@ -57,7 +56,8 @@ rod_color = 'b';
 counterweight_color = 'g';
 crank_arm_color = 'm';
 crank_shaft_color = 'k';
-set(gca,'XLim',[-max_displacement max_displacement],'YLim',[-max_displacement max_displacement],'XTick',[-max_displacement 0 max_displacement],'YTick',[-max_displacement 0 max_displacement]);
+axis_max = ceil(max_force);
+set(gca,'XLim',[-axis_max axis_max],'YLim',[-axis_max axis_max],'XTick',[-axis_max 0 axis_max],'YTick',[-axis_max 0 axis_max]);
 
 % lines for piston head
 piston_head_location = animatedline().empty(0,n_pistons);
@@ -154,8 +154,8 @@ while 1
         addpoints(counterweight_path(j),counterweight_xy(1,i),counterweight_xy(2,i))
         addpoints(counterweight_force_x(j),[counterweight_xy(1,i) counterweight_xy(1,i)+counterweight_f(1,i)],[counterweight_xy(2,i) counterweight_xy(2,i)])
         addpoints(counterweight_force_y(j),[counterweight_xy(1,i) counterweight_xy(1,i)],[counterweight_xy(2,i) counterweight_xy(2,i)+counterweight_f(2,i)])
-        addpoints(crank_shaft_force_x,[0 total_f(1,i)],[0 0])
-        addpoints(crank_shaft_force_y,[0 0],[0 total_f(2,i)])
+        addpoints(crank_shaft_force_x,[0 crankshaft_force(1,i)],[0 0])
+        addpoints(crank_shaft_force_y,[0 0],[0 crankshaft_force(2,i)])
     end
     addpoints(crank_shaft_rotation,crank_xy(1,i),crank_xy(2,i))
     addpoints(crank_shaft_point,[crank_xy(1,i) 0],[crank_xy(2,i) 0])
