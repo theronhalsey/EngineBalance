@@ -28,5 +28,5 @@ counterweight_a = [diff(counterweight_v(1,:)); diff(counterweight_v(2,:))]/dt;
 counterweight_f = counterweight_m*counterweight_a;
 
 %% Generate Output Matrix
-pistonForces = [offset_crank_xy(:,1:end-2); head_xy(:,1:end-2); [head_f(:,end-1:end) head_f(:,1:end-2)]; rod_xy(:,1:end-2); [rod_f(:,end-1:end) rod_f(:,1:end-2)]; counterweight_xy(:,1:end-2); [counterweight_f(:,end-1:end) counterweight_f(:,1:end-2)]];
+pistonForces = [offset_crank_xy(:,1:end-2); head_xy(:,1:end-2); rod_xy(:,1:end-2); counterweight_xy(:,1:end-2); [head_f(:,end-1:end) head_f(:,1:end-2)]; [rod_f(:,end-1:end) rod_f(:,1:end-2)]; [counterweight_f(:,end-1:end) counterweight_f(:,1:end-2)]];
 end
