@@ -3,12 +3,15 @@ showHeadForces = 1;
 showRodForces = 1;
 showCounterweightForces = 1;
 
+piston_layouts = ['i','f','v','r'];
+
 %% Common Parameters
 % engine parameters
 rpm = 4000;
 rps = rpm/60;
 p = 1/rps;
-n_pistons = 2;
+n_pistons = 3;
+piston_layout = piston_layouts(4);
 
 % time parameters
 dt = .00001; % time increment in seconds
@@ -16,13 +19,24 @@ t = 0:dt:p+dt;
 n_points = length(t)-2;
 
 % crankshaft (assume crankshaft is balanced)
-crank_l = 0.099060/2; % length of crank throw in meters (3.9' stroke)
+bore_d = 0.11176; % distance between each piston connection in meters (4.4")
+switch piston_layout
+    case 'i'
+        shaft_l = bore_d * n_pistons;
+    case 'r'
+        shaft_l = bore_d;
+    otherwise
+        shaft_l = .5 * bore_d * (n_pistons + 1);
+end
+
+stroke_l = 0.099060/2; % length of crank throw in meters (3.9' stroke)
 f_crank_angle = @(t) 2*pi*rps.*mod(t,p);
 crank_angles = f_crank_angle(t);
-crank_xy = crank_l/4 .* [cos(crank_angles); sin(crank_angles)]; % track the motion of a single point of the crank shaft for refrence
+crank_xy = stroke_l/4 .* [cos(crank_angles); sin(crank_angles)]; % track the motion of a single point of the crank shaft for refrence
 
 % piston parameters
 head_m = .610; % mass of piston head in kg
+head_d = 0.101727; % diameter of piston bore (4.005")
 
 % piston rod
 rod_m = .65317; % mass of piston rod in kg
@@ -30,18 +44,27 @@ rod_l = 0.1525; % length of connecting rod in meters (6' rod)
 
 %% Individual Parameters
 % piston parameters
-piston_angle = [pi/4 3*pi/4];
-crank_offset = piston_angle + [0 pi];
+switch piston_layout
+    case 'i'
+    case 'f'
+    case 'v'
+    case 'r'
+        theta = 2*pi/n_pistons;
+        piston_angle = theta:theta:2*pi;
+        crank_offset = piston_angle + linspace(0,2*pi-theta,n_pistons);
+    otherwise
+end
+
 
 % counterweight
 counterweight_m = (head_m + rod_m) * ones(1,n_pistons); % mass of counterweight
-counterweight_l = crank_l * 1.1 * ones(1,n_pistons); % distance to center of mass of counterweight from center of crankshaft
+counterweight_l = stroke_l * 1.1 * ones(1,n_pistons); % distance to center of mass of counterweight from center of crankshaft
 counterweight_offset = crank_offset + pi;
 
 %% Calculate Piston Forces
 Forces = zeros(14,n_points,n_pistons);
 for i=1:n_pistons
-    Forces(:,:,i) = piston(dt,crank_angles,crank_offset(i),crank_l,head_m,piston_angle(i),rod_m,rod_l,counterweight_m(i),counterweight_l(i),counterweight_offset(i));
+    Forces(:,:,i) = piston(dt,crank_angles,crank_offset(i),stroke_l,head_m,piston_angle(i),rod_m,rod_l,counterweight_m(i),counterweight_l(i),counterweight_offset(i));
 end
 
 % total force on crankshaft at time t
@@ -111,7 +134,7 @@ for i=1:n_pistons
     if showRodForces
         rod_com_force_x(i) = animatedline('color',rod_color,'LineStyle','-');
         rod_com_force_y(i) = animatedline('color',rod_color,'LineStyle','-');
-    end    
+    end
 
     counterweight_location(i) = animatedline('color',counterweight_color,'LineStyle','-','Marker','.','markersize',20);
     counterweight_path(i) = animatedline('color',counterweight_color,'LineStyle','-');
@@ -155,7 +178,7 @@ while 1
             clearpoints(rod_com_force_x(j))
             clearpoints(rod_com_force_y(j))
         end
-        
+
         clearpoints(counterweight_location(j))
         if showCounterweightForces
             clearpoints(counterweight_force_x(j))
