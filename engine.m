@@ -49,12 +49,10 @@ switch piston_layout
     case 'f'
     case 'v'
     case 'r'
-        theta = 2*pi/n_pistons;
-        piston_angle = theta:theta:2*pi;
-        crank_offset = piston_angle + linspace(0,2*pi-theta,n_pistons);
+        piston_angle = linspace(0,2*pi*(1-1/n_pistons),n_pistons);
+        crank_offset = 2*piston_angle;
     otherwise
 end
-
 
 % counterweight
 counterweight_m = (head_m + rod_m) * ones(1,n_pistons); % mass of counterweight
