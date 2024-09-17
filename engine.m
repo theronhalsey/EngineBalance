@@ -14,7 +14,7 @@ n_pistons = 3;
 piston_layout = piston_layouts(4);
 
 % time parameters
-dt = .00001; % time increment in seconds
+dt = .00005; % time increment in seconds
 t = 0:dt:p+dt;
 n_points = length(t)-2;
 
