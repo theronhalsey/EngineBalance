@@ -10,7 +10,7 @@ piston_layouts = ['i','f','v','r'];
 rpm = 4000;
 rps = rpm/60;
 p = 1/rps;
-n_pistons = 3;
+n_pistons = 6;
 piston_layout = piston_layouts(4);
 
 % time parameters
@@ -46,7 +46,11 @@ rod_l = 0.1525; % length of connecting rod in meters (6' rod)
 % piston parameters
 switch piston_layout
     case 'i'
+        piston_angle = ones(1,n_pistons) * (pi/4);
+        crank_offset = linspace(0,2*pi*(1-1/n_pistons),n_pistons);
     case 'f'
+        piston_angle = 0:pi:pi*(n_pistons-1);
+        crank_offset = piston_angle;
     case 'v'
     case 'r'
         piston_angle = linspace(0,2*pi*(1-1/n_pistons),n_pistons);
@@ -55,8 +59,8 @@ switch piston_layout
 end
 
 % counterweight
-counterweight_m = (head_m + rod_m) * ones(1,n_pistons); % mass of counterweight
-counterweight_l = stroke_l * 1.1 * ones(1,n_pistons); % distance to center of mass of counterweight from center of crankshaft
+counterweight_m = (head_m+rod_m) * ones(1,n_pistons); % mass of counterweight
+counterweight_l = stroke_l * .525 * ones(1,n_pistons); % distance to center of mass of counterweight from center of crankshaft
 counterweight_offset = crank_offset + pi;
 
 %% Calculate Piston Forces
@@ -66,7 +70,7 @@ for i=1:n_pistons
 end
 
 % total force on crankshaft at time t
-crankshaft_force = -Forces(9:10,:,:) - Forces(11:12,:,:) - Forces(13:14,:,:);
+crankshaft_force = -sum(Forces(9:10,:,:),3) - sum(Forces(11:12,:,:),3) - sum(Forces(13:14,:,:),3);
 
 % max displacement and force
 max_displacement = max(abs(Forces(3:4,:,:)),[],'all');
