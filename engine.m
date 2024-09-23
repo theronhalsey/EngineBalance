@@ -1,3 +1,4 @@
+function engineForces = engine()
 % toggles for which forces to show in animation
 showHeadForces = 1;
 showRodForces = 1;
@@ -66,24 +67,24 @@ counterweight_l = stroke_l * .5 * ones(1,n_pistons); % distance to center of mas
 counterweight_offset = crank_offset + pi;
 
 %% Calculate Piston Forces
-Forces = zeros(14,n_points,n_pistons);
+engineForces = zeros(14,n_points,n_pistons);
 for i=1:n_pistons
-    Forces(:,:,i) = piston(dt,crank_angles,crank_offset(i),stroke_l,head_m,piston_angle(i),rod_m,rod_l,counterweight_m(i),counterweight_l(i),counterweight_offset(i));
+    engineForces(:,:,i) = piston(dt,crank_angles,crank_offset(i),stroke_l,head_m,piston_angle(i),rod_m,rod_l,counterweight_m(i),counterweight_l(i),counterweight_offset(i));
 end
 
 % total force on crankshaft at time t
-crankshaft_force = -(sum(Forces(9:10,:,:),3) + sum(Forces(11:12,:,:),3) + sum(Forces(13:14,:,:),3));
+crankshaft_force = -(sum(engineForces(9:10,:,:),3) + sum(engineForces(11:12,:,:),3) + sum(engineForces(13:14,:,:),3));
 
 % max displacement and force
-max_displacement = max(abs(Forces(3:4,:,:)),[],'all');
-max_component_force = max(abs(Forces(9:end,:,:)),[],'all');
+max_displacement = max(abs(engineForces(3:4,:,:)),[],'all');
+max_component_force = max(abs(engineForces(9:end,:,:)),[],'all');
 max_force_cranfshaft = max(abs(crankshaft_force),[],'all');
 max_force = max([max_component_force max_force_cranfshaft]);
 
 % scale displacement to force
 scale = max_force/max_displacement;
 crank_xy = crank_xy * scale;
-Forces(1:8,:,:) = Forces(1:8,:,:) * scale;
+engineForces(1:8,:,:) = engineForces(1:8,:,:) * scale;
 
 %% Animation
 piston_head_color = 'r';
@@ -162,13 +163,13 @@ addpoints(crank_shaft_center,0,0)
 i = 1; % increment for animation
 while 1
     for j=1:n_pistons
-        piston_crank_xy = Forces(1:2,i,j);
-        head_xy = Forces(3:4,i,j);
-        rod_xy = Forces(5:6,i,j);
-        counterweight_xy = Forces(7:8,i,j);
-        head_f = Forces(9:10,i,j);
-        rod_f = Forces(11:12,i,j);
-        counterweight_f = Forces(13:14,i,j);
+        piston_crank_xy = engineForces(1:2,i,j);
+        head_xy = engineForces(3:4,i,j);
+        rod_xy = engineForces(5:6,i,j);
+        counterweight_xy = engineForces(7:8,i,j);
+        head_f = engineForces(9:10,i,j);
+        rod_f = engineForces(11:12,i,j);
+        counterweight_f = engineForces(13:14,i,j);
 
         clearpoints(piston_head_location(j))
         if showHeadForces
