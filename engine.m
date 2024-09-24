@@ -1,18 +1,14 @@
-function engineForces = engine()
+function [engineForces,crankshaftForces] = engine(n_pistons,piston_layout,piston_angles,crank_offsets)
 % toggles for which forces to show in animation
 showHeadForces = 1;
 showRodForces = 1;
 showCounterweightForces = 1;
-
-piston_layouts = ['i','f','v','r'];
 
 %% Common Parameters
 % engine parameters
 rpm = 4000;
 rps = rpm/60;
 p = 1/rps;
-n_pistons = 3;
-piston_layout = piston_layouts(1);
 
 % time parameters
 dt = .00005; % time increment in seconds
@@ -43,42 +39,24 @@ head_d = 0.101727; % diameter of piston bore (4.005")
 rod_m = .65317; % mass of piston rod in kg
 rod_l = 0.1525; % length of connecting rod in meters (6' rod)
 
-%% Individual Parameters
-% piston parameters
-switch piston_layout
-    case 'i'
-        piston_angle = ones(1,n_pistons) * (pi/2);
-        crank_offset = linspace(0,2*pi*(1-1/n_pistons),n_pistons);
-    case 'f'
-        piston_angle = 0:pi:pi*(n_pistons-1);
-        crank_offset = 0:pi/(n_pistons/2):pi-pi/(n_pistons/2);
-        crank_offset = [crank_offset;crank_offset];
-        crank_offset = crank_offset(:)' + piston_angle;
-    case 'v'
-    case 'r'
-        piston_angle = linspace(0,2*pi*(1-1/n_pistons),n_pistons);
-        crank_offset = 2*piston_angle;
-    otherwise
-end
-
 % counterweight
 counterweight_m = (head_m+rod_m) * ones(1,n_pistons); % mass of counterweight
 counterweight_l = stroke_l * .5 * ones(1,n_pistons); % distance to center of mass of counterweight from center of crankshaft
-counterweight_offset = crank_offset + pi;
+counterweight_offset = crank_offsets + pi;
 
 %% Calculate Piston Forces
 engineForces = zeros(14,n_points,n_pistons);
 for i=1:n_pistons
-    engineForces(:,:,i) = piston(dt,crank_angles,crank_offset(i),stroke_l,head_m,piston_angle(i),rod_m,rod_l,counterweight_m(i),counterweight_l(i),counterweight_offset(i));
+    engineForces(:,:,i) = piston(dt,crank_angles,crank_offsets(i),stroke_l,head_m,piston_angles(i),rod_m,rod_l,counterweight_m(i),counterweight_l(i),counterweight_offset(i));
 end
 
 % total force on crankshaft at time t
-crankshaft_force = -(sum(engineForces(9:10,:,:),3) + sum(engineForces(11:12,:,:),3) + sum(engineForces(13:14,:,:),3));
+crankshaftForces = [crank_xy(:,1:end-2); -(sum(engineForces(9:10,:,:),3) + sum(engineForces(11:12,:,:),3) + sum(engineForces(13:14,:,:),3))];
 
 % max displacement and force
 max_displacement = max(abs(engineForces(3:4,:,:)),[],'all');
 max_component_force = max(abs(engineForces(9:end,:,:)),[],'all');
-max_force_cranfshaft = max(abs(crankshaft_force),[],'all');
+max_force_cranfshaft = max(abs(crankshaftForces(3:end,:)),[],'all');
 max_force = max([max_component_force max_force_cranfshaft]);
 
 % scale displacement to force
@@ -218,8 +196,8 @@ while 1
     clearpoints(crank_shaft_force_x)
     clearpoints(crank_shaft_force_y)
 
-    addpoints(crank_shaft_force_x,[0 crankshaft_force(1,i)],[0 0])
-    addpoints(crank_shaft_force_y,[0 0],[0 crankshaft_force(2,i)])
+    addpoints(crank_shaft_force_x,[0 crankshaftForces(3,i)],[0 0])
+    addpoints(crank_shaft_force_y,[0 0],[0 crankshaftForces(4,i)])
     addpoints(crank_shaft_rotation,crank_xy(1,i),crank_xy(2,i))
     addpoints(crank_shaft_point,[0 crank_xy(1,i)],[0 crank_xy(2,i)])
     drawnow
