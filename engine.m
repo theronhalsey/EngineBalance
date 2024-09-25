@@ -1,4 +1,4 @@
-function [engineForces,crankshaftForces] = engine(n_pistons,piston_layout,piston_angles,crank_offsets,counterweight_offsets)
+function [engineForces,crankshaftForces] = engine(n_pistons,piston_layout,piston_angles,crank_offsets,counterweight_offsets,counterweight_scale)
 
 
 %% Common Parameters
@@ -36,7 +36,7 @@ rod_m = .65317; % mass of piston rod in kg
 rod_l = 0.1525; % length of connecting rod in meters (6' rod)
 
 % counterweight
-counterweight_m = (head_m+rod_m) * ones(1,n_pistons); % mass of counterweight
+counterweight_m = (head_m+rod_m) * ones(1,n_pistons) * counterweight_scale; % mass of counterweight
 counterweight_l = stroke_l * .5 * ones(1,n_pistons); % distance to center of mass of counterweight from center of crankshaft
 
 %% Calculate Piston Forces
