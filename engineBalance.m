@@ -1,15 +1,16 @@
 % toggles for which forces to show in animation
 animate = 1;
-record = 0;
+record = 1;
 showHeadForces = 1;
 showRodForces = 1;
 showCounterweightForces = 1;
 
 piston_layouts = ['i','f','v','r'];
-animations_path = "Animations\";
+output_path = "Engines\";
 
 %% 120-degree inline 3
 engine_type = "120_i3";
+mkdir(output_path + engine_type)
 piston_layout = piston_layouts(1);
 n_pistons = 3;
 piston_angles = ones(1,n_pistons) * (pi/2);
@@ -19,6 +20,7 @@ counterweight_scale = 0; % default mass = piston head + connecting rod
 
 %% crossplane inline 3
 % engine_type = "crossplane_i3";
+% mkdir(output_path + engine_type)
 % piston_layout = piston_layouts(1);
 % n_pistons = 3;
 % piston_angles = ones(1,n_pistons) * (pi/2);
@@ -49,7 +51,7 @@ counterweight_scale = 0; % default mass = piston head + connecting rod
 %% Animation
 if animate
     if record
-        video = VideoWriter(animations_path + engine_type);
+        video = VideoWriter(output_path + engine_type + "\" + engine_type);
         video.FrameRate = 60;
         open(video);
     end
