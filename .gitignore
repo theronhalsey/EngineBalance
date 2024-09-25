@@ -29,3 +29,9 @@ octave-workspace
 
 # Published documents
 *.pdf
+
+# Figures
+*.png
+
+# Animations
+*.avi
