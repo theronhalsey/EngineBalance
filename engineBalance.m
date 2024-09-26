@@ -4,28 +4,40 @@ record = 1;
 showHeadForces = 1;
 showRodForces = 1;
 showCounterweightForces = 1;
+showForces = [showHeadForces showRodForces showCounterweightForces];
+output_path = "Engines\";
 
 piston_layouts = ['i','f','v','r'];
 
-%% 120-degree inline 3
-% engine_type = "120_i3";
-% mkdir(output_path + engine_type)
-% piston_layout = piston_layouts(1);
-% n_pistons = 3;
-% piston_angles = ones(1,n_pistons) * (pi/2);
-% crank_offsets = linspace(0,2*pi*(1-1/n_pistons),n_pistons);
-% counterweight_offsets = crank_offsets + pi;
-% counterweight_scale = 0; % default mass = piston head + connecting rod
+%% 120-degree Inline_3 Firing Order_1-2-3
+engine_type = "i3_120_123";
+piston_layout = piston_layouts(1);
+n_pistons = 3;
+piston_angles = ones(1,n_pistons) * (pi/2);
+crank_offsets = linspace(0,2*pi*(1-1/n_pistons),n_pistons);
+counterweight_offsets = crank_offsets + pi;
+counterweight_scale = 0; % default mass = piston head + connecting rod
+i3_120_123 = EngineConfiguration(engine_type,piston_layout,n_pistons,piston_angles,crank_offsets,counterweight_offsets,counterweight_scale,output_path);
 
-%% crossplane inline 3
-engine_type = "crossplane_i3";
-mkdir(output_path + engine_type)
+%% Crossplane Inline_3 Firing Order_1-2-3
+engine_type = "crossplane_i3_123";
 piston_layout = piston_layouts(1);
 n_pistons = 3;
 piston_angles = ones(1,n_pistons) * (pi/2);
 crank_offsets = [0 pi/2 pi];
 counterweight_offsets = crank_offsets + pi;
 counterweight_scale = 1; % default mass = piston head + connecting rod
+crossplane_i3_123 = EngineConfiguration(engine_type,piston_layout,n_pistons,piston_angles,crank_offsets,counterweight_offsets,counterweight_scale,output_path);
+
+%% 90-Degree Inline_4 Firing Order_1-2-3-4
+engine_type = "i4_90_1234";
+piston_layout = piston_layouts(1);
+n_pistons = 4;
+piston_angles = ones(1,4) * (pi/2);
+crank_offsets = linspace(0,2*pi*(1-1/4),4);
+counterweight_offsets = crank_offsets + pi;
+counterweight_scale = 1; % default mass = piston head + connecting rod
+i4_90_1234 = EngineConfiguration(engine_type,piston_layout,n_pistons,piston_angles,crank_offsets,counterweight_offsets,counterweight_scale,output_path);
 
 % switch piston_layout
 %     case 'i'
@@ -45,9 +57,9 @@ counterweight_scale = 1; % default mass = piston head + connecting rod
 % end
 
 %% Calculate Forces
-[engineForces,crankshaftForces] = engine(n_pistons,piston_layout,piston_angles,crank_offsets,counterweight_offsets,counterweight_scale);
+[engineForces,crankshaftForces] = engine(i3_120_123);
 
 %% Animation
 if animate
-    AnimateEngine(engine_type,n_pistons,engineForces,crankshaftForces,record,showHeadForces,showRodForces,showCounterweightForces);
+    AnimateEngine(i3_120_123,engineForces,crankshaftForces,record,output_path,showForces);
 end

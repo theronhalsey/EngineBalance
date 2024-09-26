@@ -1,7 +1,7 @@
-function AnimateEngine(engine_type,n_pistons,engineForces,crankshaftForces,record,showHeadForces,showRodForces,showCounterweightForces)
-output_path = "Engines\";
+function AnimateEngine(engine_config,engineForces,crankshaftForces,record,output_path,showForces)
+clf
 if record
-    video = VideoWriter(output_path + engine_type + "\" + engine_type);
+    video = VideoWriter(output_path + engine_config.engine_type + "\" + engine_config.engine_type);
     video.FrameRate = 60;
     open(video);
 end
@@ -29,39 +29,39 @@ axis_max = ceil(1.1*max_force);
 set(gca,'XLim',[-axis_max axis_max],'YLim',[-axis_max axis_max],'XTick',[-axis_max 0 axis_max],'YTick',[-axis_max 0 axis_max]);
 
 % lines for piston heads
-piston_head_location = animatedline().empty(0,n_pistons);
-piston_head_path = animatedline().empty(0,n_pistons);
-if showHeadForces
-    piston_head_force_x = animatedline().empty(0,n_pistons);
-    piston_head_force_y = animatedline().empty(0,n_pistons);
+piston_head_location = animatedline().empty(0,engine_config.n_pistons);
+piston_head_path = animatedline().empty(0,engine_config.n_pistons);
+if showForces(1)
+    piston_head_force_x = animatedline().empty(0,engine_config.n_pistons);
+    piston_head_force_y = animatedline().empty(0,engine_config.n_pistons);
 end
 
 % lines for piston rods
-rod_com_location = animatedline().empty(0,n_pistons);
-rod_com_path = animatedline().empty(0,n_pistons);
-rod_body = animatedline().empty(0,n_pistons);
-if showRodForces
-    rod_com_force_x = animatedline().empty(0,n_pistons);
-    rod_com_force_y = animatedline().empty(0,n_pistons);
+rod_com_location = animatedline().empty(0,engine_config.n_pistons);
+rod_com_path = animatedline().empty(0,engine_config.n_pistons);
+rod_body = animatedline().empty(0,engine_config.n_pistons);
+if showForces(2)
+    rod_com_force_x = animatedline().empty(0,engine_config.n_pistons);
+    rod_com_force_y = animatedline().empty(0,engine_config.n_pistons);
 end
 
 % lines for piston counterweights
-counterweight_location = animatedline().empty(0,n_pistons);
-counterweight_path = animatedline().empty(0,n_pistons);
-if showCounterweightForces
-    counterweight_force_x = animatedline().empty(0,n_pistons);
-    counterweight_force_y = animatedline().empty(0,n_pistons);
+counterweight_location = animatedline().empty(0,engine_config.n_pistons);
+counterweight_path = animatedline().empty(0,engine_config.n_pistons);
+if showForces(3)
+    counterweight_force_x = animatedline().empty(0,engine_config.n_pistons);
+    counterweight_force_y = animatedline().empty(0,engine_config.n_pistons);
 end
 
 % lines for crank shafts
-crank_arm_location = animatedline().empty(0,n_pistons);
-crank_arm_path = animatedline().empty(0,n_pistons);
+crank_arm_location = animatedline().empty(0,engine_config.n_pistons);
+crank_arm_path = animatedline().empty(0,engine_config.n_pistons);
 
 % define styles for each line for each piston component
-for i=1:n_pistons
+for i=1:engine_config.n_pistons
     piston_head_location(i) = animatedline('color',piston_head_color,'Marker','.','markersize',20);
     piston_head_path(i) = animatedline('color',piston_head_color,'LineStyle','-');
-    if showHeadForces
+    if showForces(1)
         piston_head_force_x(i) = animatedline('color',piston_head_color,'LineStyle','-');
         piston_head_force_y(i) = animatedline('color',piston_head_color,'LineStyle','-');
     end
@@ -69,14 +69,14 @@ for i=1:n_pistons
     rod_com_location(i) = animatedline('color',rod_color,'Marker','.','markersize',20);
     rod_com_path(i) = animatedline('color',rod_color,'LineStyle','-');
     rod_body(i) = animatedline('color',rod_color,'LineStyle','-');
-    if showRodForces
+    if showForces(2)
         rod_com_force_x(i) = animatedline('color',rod_color,'LineStyle','-');
         rod_com_force_y(i) = animatedline('color',rod_color,'LineStyle','-');
     end
 
     counterweight_location(i) = animatedline('color',counterweight_color,'LineStyle','-','Marker','.','markersize',20);
     counterweight_path(i) = animatedline('color',counterweight_color,'LineStyle','-');
-    if showCounterweightForces
+    if showForces(3)
         counterweight_force_x(i) = animatedline('color',counterweight_color,'LineStyle','-');
         counterweight_force_y(i) = animatedline('color',counterweight_color,'LineStyle','-');
     end
@@ -96,7 +96,7 @@ addpoints(crank_shaft_center,0,0)
 i = 1; % increment for animation
 loops = 5 * resolution;
 while loops
-    for j=1:n_pistons
+    for j=1:engine_config.n_pistons
         piston_crank_xy = engineForces(1:2,i,j);
         head_xy = engineForces(3:4,i,j);
         rod_xy = engineForces(5:6,i,j);
@@ -106,20 +106,20 @@ while loops
         counterweight_f = engineForces(13:14,i,j);
 
         clearpoints(piston_head_location(j))
-        if showHeadForces
+        if showForces(1)
             clearpoints(piston_head_force_x(j))
             clearpoints(piston_head_force_y(j))
         end
 
         clearpoints(rod_com_location(j))
         clearpoints(rod_body(j))
-        if showRodForces
+        if showForces(2)
             clearpoints(rod_com_force_x(j))
             clearpoints(rod_com_force_y(j))
         end
 
         clearpoints(counterweight_location(j))
-        if showCounterweightForces
+        if showForces(3)
             clearpoints(counterweight_force_x(j))
             clearpoints(counterweight_force_y(j))
         end
@@ -128,7 +128,7 @@ while loops
 
         addpoints(piston_head_location(j),head_xy(1),head_xy(2))
         addpoints(piston_head_path(j),head_xy(1),head_xy(2))
-        if showHeadForces
+        if showForces(1)
             addpoints(piston_head_force_x(j),[head_xy(1) head_xy(1)+head_f(1)], [head_xy(2) head_xy(2)])
             addpoints(piston_head_force_y(j),[head_xy(1) head_xy(1)], [head_xy(2) head_xy(2)+head_f(2)])
         end
@@ -137,13 +137,13 @@ while loops
         addpoints(crank_arm_path(j),piston_crank_xy(1),piston_crank_xy(2))
         addpoints(rod_com_location(j),rod_xy(1),rod_xy(2))
         addpoints(rod_com_path(j),rod_xy(1),rod_xy(2))
-        if showRodForces
+        if showForces(2)
             addpoints(rod_com_force_x(j),[rod_xy(1) rod_xy(1)+rod_f(1)],[rod_xy(2) rod_xy(2)])
             addpoints(rod_com_force_y(j),[rod_xy(1) rod_xy(1)],[rod_xy(2) rod_xy(2)+rod_f(2)])
         end
         addpoints(counterweight_location(j),[counterweight_xy(1) 0],[counterweight_xy(2) 0])
         addpoints(counterweight_path(j),counterweight_xy(1),counterweight_xy(2))
-        if showCounterweightForces
+        if showForces(3)
             addpoints(counterweight_force_x(j),[counterweight_xy(1) counterweight_xy(1)+counterweight_f(1)],[counterweight_xy(2) counterweight_xy(2)])
             addpoints(counterweight_force_y(j),[counterweight_xy(1) counterweight_xy(1)],[counterweight_xy(2) counterweight_xy(2)+counterweight_f(2)])
         end
@@ -171,5 +171,4 @@ end
 if record
     close(video)
 end
-
 end

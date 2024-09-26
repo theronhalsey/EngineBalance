@@ -1,6 +1,4 @@
-function [engineForces,crankshaftForces] = engine(n_pistons,piston_layout,piston_angles,crank_offsets,counterweight_offsets,counterweight_scale)
-
-
+function [engineForces,crankshaftForces] = engine(engine_config)
 %% Common Parameters
 % engine parameters
 rpm = 4000;
@@ -14,13 +12,13 @@ n_points = length(t)-2;
 
 % crankshaft (assume crankshaft is balanced)
 bore_d = 0.11176; % distance between each piston connection in meters (4.4")
-switch piston_layout
+switch engine_config.piston_layout
     case 'i'
-        shaft_l = bore_d * n_pistons;
+        shaft_l = bore_d * engine_config.n_pistons;
     case 'r'
         shaft_l = bore_d;
     otherwise
-        shaft_l = .5 * bore_d * (n_pistons + 1);
+        shaft_l = .5 * bore_d * (engine_config.n_pistons + 1);
 end
 
 stroke_l = 0.099060/2; % length of crank throw in meters (3.9' stroke)
@@ -36,13 +34,13 @@ rod_m = .65317; % mass of piston rod in kg
 rod_l = 0.1525; % length of connecting rod in meters (6' rod)
 
 % counterweight
-counterweight_m = (head_m+rod_m) * ones(1,n_pistons) * counterweight_scale; % mass of counterweight
-counterweight_l = stroke_l * .5 * ones(1,n_pistons); % distance to center of mass of counterweight from center of crankshaft
+counterweight_m = (head_m+rod_m) * ones(1,engine_config.n_pistons) * engine_config.counterweight_scale; % mass of counterweight
+counterweight_l = stroke_l * .5 * ones(1,engine_config.n_pistons); % distance to center of mass of counterweight from center of crankshaft
 
 %% Calculate Piston Forces
-engineForces = zeros(14,n_points,n_pistons);
-for i=1:n_pistons
-    engineForces(:,:,i) = piston(dt,crank_angles,crank_offsets(i),stroke_l,head_m,piston_angles(i),rod_m,rod_l,counterweight_m(i),counterweight_l(i),counterweight_offsets(i));
+engineForces = zeros(14,n_points,engine_config.n_pistons);
+for i=1:engine_config.n_pistons
+    engineForces(:,:,i) = piston(dt,crank_angles,engine_config.crank_offsets(i),stroke_l,head_m,engine_config.piston_angles(i),rod_m,rod_l,counterweight_m(i),counterweight_l(i),engine_config.counterweight_offsets(i));
 end
 
 % total force on crankshaft at time t
