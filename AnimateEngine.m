@@ -1,10 +1,23 @@
-function AnimateEngine(engine_config,engineForces,crankshaftForces,record,output_path,showForces)
+function AnimateEngine(engine_config,engineForces,crankshaftForces,record,showForces,output_path)
+arguments
+    engine_config
+    engineForces
+    crankshaftForces
+    record
+    showForces = [1 1 1]
+    output_path = "Engines\"
+end
+
+% clear previous figure/animation
 clf
+
+% settings for saving animation to video
 if record
     video = VideoWriter(output_path + engine_config.engine_type + "\" + engine_config.engine_type);
     video.FrameRate = 60;
     open(video);
 end
+
 % number of sampled points from simulation
 resolution = length(engineForces);
 
@@ -152,8 +165,8 @@ while loops
     clearpoints(crank_shaft_force_x)
     clearpoints(crank_shaft_force_y)
 
-    addpoints(crank_shaft_force_x,[0 crankshaftForces(3,i)],[0 0])
-    addpoints(crank_shaft_force_y,[0 0],[0 crankshaftForces(4,i)])
+    addpoints(crank_shaft_force_x,[0 crankshaftForces(end-1,i)],[0 0])
+    addpoints(crank_shaft_force_y,[0 0],[0 crankshaftForces(end,i)])
     addpoints(crank_shaft_rotation,crankshaftForces(1,i),crankshaftForces(2,i))
     addpoints(crank_shaft_point,[0 crankshaftForces(1,i)],[0 crankshaftForces(2,i)])
 

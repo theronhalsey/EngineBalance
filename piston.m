@@ -1,5 +1,4 @@
 function pistonForces = piston(dt,crank_angles,crank_offset,crank_l,head_m,piston_angle,rod_m,rod_l,counterweight_m,counterweight_l,counterweight_offset)
-
 %% Calculate Angles and Displacement
 offset_crank_angles = crank_angles + crank_offset;
 aR = offset_crank_angles - piston_angle; % angles opposite piston rod
